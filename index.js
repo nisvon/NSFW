@@ -14,15 +14,13 @@ app.get('/render', async (req, res) => {
   try {
     browser = await puppeteer.launch({
       executablePath: '/usr/bin/google-chrome-stable',
-      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu', '--single-process'],
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu'],
       headless: 'new'
     })
     const page = await browser.newPage()
-
     await page.setExtraHTTPHeaders({
       'X-Prerender-Internal': 'true'
     })
-
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 })
     await new Promise(r => setTimeout(r, 3000))
     const html = await page.content()
