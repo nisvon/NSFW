@@ -12,7 +12,6 @@ app.get('/render', async (req, res) => {
   const { url } = req.query
   if (!url) return res.status(400).send('Missing url parameter')
 
-  // Fetch from Lovable origin directly to avoid infinite loop
   const targetUrl = url
     .replace('https://nsfw-tools.com', ORIGIN)
     .replace('https://www.nsfw-tools.com', ORIGIN)
@@ -24,6 +23,14 @@ app.get('/render', async (req, res) => {
       headless: 'new'
     })
     const page = await browser.newPage()
+
+    // Set extra headers to avoid Lovable rejecting the request
+    await page.setExtraHTTPHeaders({
+      'host': 'bliss-arsenal.lovable.app',
+      'origin': ORIGIN,
+      'referer': ORIGIN
+    })
+
     await page.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: 30000 })
     await new Promise(r => setTimeout(r, 3000))
     const html = await page.content()
