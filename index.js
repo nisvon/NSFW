@@ -1,5 +1,5 @@
 const express = require('express')
-const puppeteer = require('puppeteer-core')
+const puppeteer = require('puppeteer')
 
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -13,8 +13,7 @@ app.get('/render', async (req, res) => {
   let browser
   try {
     browser = await puppeteer.launch({
-      executablePath: '/usr/bin/google-chrome-stable',
-      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu'],
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu', '--single-process'],
       headless: 'new'
     })
     const page = await browser.newPage()
