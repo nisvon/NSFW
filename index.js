@@ -17,8 +17,8 @@ app.get('/render', async (req, res) => {
       headless: 'new'
     })
     const page = await browser.newPage()
-    await page.goto(url, { waitUntil: 'networkidle0', timeout: 30000 })
-    await new Promise(r => setTimeout(r, 2000))
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 })
+    await new Promise(r => setTimeout(r, 3000))
     const html = await page.content()
     res.set('Content-Type', 'text/html')
     res.send(html)
