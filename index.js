@@ -1,5 +1,5 @@
 const express = require('express')
-const puppeteer = require('puppeteer')
+const puppeteer = require('puppeteer-core')
 
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -13,12 +13,12 @@ app.get('/render', async (req, res) => {
   let browser
   try {
     browser = await puppeteer.launch({
+      executablePath: '/usr/bin/google-chrome-stable',
       args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu', '--single-process'],
       headless: 'new'
     })
     const page = await browser.newPage()
 
-    // Add bypass header so Cloudflare Worker doesn't loop
     await page.setExtraHTTPHeaders({
       'X-Prerender-Internal': 'true'
     })
