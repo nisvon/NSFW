@@ -4,11 +4,18 @@ const puppeteer = require('puppeteer')
 const app = express()
 const PORT = process.env.PORT || 3000
 
+const ORIGIN = 'https://bliss-arsenal.lovable.app'
+
 app.get('/health', (req, res) => res.send('OK'))
 
 app.get('/render', async (req, res) => {
   const { url } = req.query
   if (!url) return res.status(400).send('Missing url parameter')
+
+  // Fetch from Lovable origin directly to avoid infinite loop
+  const targetUrl = url
+    .replace('https://nsfw-tools.com', ORIGIN)
+    .replace('https://www.nsfw-tools.com', ORIGIN)
 
   let browser
   try {
@@ -17,7 +24,7 @@ app.get('/render', async (req, res) => {
       headless: 'new'
     })
     const page = await browser.newPage()
-    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 })
+    await page.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: 30000 })
     await new Promise(r => setTimeout(r, 3000))
     const html = await page.content()
     res.set('Content-Type', 'text/html')
