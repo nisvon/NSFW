@@ -1,5 +1,5 @@
 const express = require('express')
-const puppeteer = require('puppeteer')
+const puppeteer = require('puppeteer-core')
 const { execSync } = require('child_process')
 
 const app = express()
