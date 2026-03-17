@@ -1,6 +1,5 @@
 const express = require('express')
 const puppeteer = require('puppeteer-core')
-const chromium = require('@sparticuz/chromium')
 
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -14,10 +13,9 @@ app.get('/render', async (req, res) => {
   let browser
   try {
     browser = await puppeteer.launch({
-      args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(),
-      headless: chromium.headless
+      executablePath: '/usr/bin/google-chrome-stable',
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu'],
+      headless: 'new'
     })
     const page = await browser.newPage()
     await page.goto(url, { waitUntil: 'networkidle0', timeout: 30000 })
