@@ -1,17 +1,11 @@
 const express = require('express')
 const puppeteer = require('puppeteer-core')
-const { execSync } = require('child_process')
+const chromium = require('@sparticuz/chromium')
 
 const app = express()
 const PORT = process.env.PORT || 3000
 
-function getChromiumPath() {
-  try {
-    return execSync('which chromium || which chromium-browser || which google-chrome').toString().trim()
-  } catch {
-    return null
-  }
-}
+app.get('/health', (req, res) => res.send('OK'))
 
 app.get('/render', async (req, res) => {
   const { url } = req.query
@@ -19,11 +13,11 @@ app.get('/render', async (req, res) => {
 
   let browser
   try {
-    const executablePath = process.env.PUPPETEER_EXECUTABLE_PATH || getChromiumPath()
     browser = await puppeteer.launch({
-      executablePath,
-      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu'],
-      headless: 'new'
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless
     })
     const page = await browser.newPage()
     await page.goto(url, { waitUntil: 'networkidle0', timeout: 30000 })
@@ -36,11 +30,6 @@ app.get('/render', async (req, res) => {
   } finally {
     if (browser) await browser.close()
   }
-})
-
-app.get('/health', (req, res) => {
-  const path = getChromiumPath()
-  res.send(`OK - chromium at: ${path}`)
 })
 
 app.listen(PORT, () => console.log(`Prerender on port ${PORT}`))
